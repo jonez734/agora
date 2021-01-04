@@ -219,12 +219,12 @@ def additem(dbh, opts):
     
     if rec.has_key("id"):
       del rec["id"]
-    print bbsengine.insert(dbh, "agora.__itemamzn", rec)
+    ttyio.echo(bbsengine.insert(dbh, "agora.__itemamzn", rec))
     dbh.commit()
   return
 
 def listitems(dbh):
-  sql = "select * from agora.itemamzn order by id asc"
+  sql = "select * from agora.itemamzn order by datecreated desc"
   cur = dbh.cursor()
   cur.execute(sql)
   res = cur.fetchall()
@@ -238,6 +238,9 @@ def listitems(dbh):
     fp.close()
     os.system("LESSECURE=1 less %s" % (listfn))
     os.remove(listfn)
+  else:
+    ttyio.echo("no amznitems")
+
   return
 
 def main():
@@ -275,11 +278,9 @@ def main():
 
   while not done:
     terminalwidth = ttyio.getterminalwidth()
-    ttyio.echo("terminalwidth=%r, calc=%r" % (terminalwidth, (terminalwidth/2-2)), level="debug")
+    # ttyio.echo("terminalwidth=%r, calc=%r" % (terminalwidth, (terminalwidth/2-2)), level="debug")
 
-    ttyio.echo("-="*(terminalwidth/2-2))
-    ttyio.echo("agora (marketplace)")
-    ttyio.echo("-="*(terminalwidth/2-2))
+    bbsengine.title("agora (marketplace)", color="{bggray}{white}", hrcolor="{green}")
     ttyio.echo()
     ttyio.echo("[A]dd")
     ttyio.echo("[E]dit")
