@@ -4,11 +4,11 @@ import sys
 import copy
 import string
 import tempfile
-import ConfigParser
+import argparse
 
 import psycopg2, psycopg2.extras
 
-import ttyio2 as ttyio
+import ttyio4 as ttyio
 import bbsengine4 as bbsengine
 
 currentmemberid = None
@@ -76,13 +76,7 @@ def _edit(dbh, item, header):
   original = copy.deepcopy(item)
   
   while not done:
-    terminalwidth = ttyio.getterminalwidth()
-#    ttyio.echo("terminalwidth=%r, calc=%r" % (terminalwidth, (terminalwidth/2-2)))
-    ttyio.echo("-="*(terminalwidth/2-2))
-
-    ttyio.echo(header)
-    ttyio.echo("-="*(terminalwidth/2-2))
-    ttyio.echo()
+    bbsengine.title(header, titlecolor="{bggray}{white}", hrcolor="{green}")
 
     if item != original:
       dirty = True
@@ -138,8 +132,6 @@ def _edit(dbh, item, header):
         item["title"] = None
       else:
         item["title"] = buf
-    elif ch == "S":
-      ttyio.echo("sigs")
   return item
 
 def _get(dbh, asin):
@@ -211,7 +203,7 @@ def additem(dbh, opts):
     ttyio.echo("duplicate url", level="error")
     return
 
-  if bbsengine.inputboolean("add?") is True:
+  if bbsengine.inputboolean("add? ") is True:
     rec["postedby"] = currentmemberid
     rec["dateposted"] = "now()"
     rec["lastmodified"] = "now()"
@@ -251,7 +243,7 @@ def main():
   membermap = {"jam" : 1}
 
   loginid = pwd.getpwuid(os.geteuid())[0]
-  if membermap.has_key(loginid):
+  if loginid in membermap:
     currentmemberid = membermap[loginid]
     ttyio.echo("** currentmemberid=%r" % (currentmemberid))
   else:
@@ -260,44 +252,39 @@ def main():
 
   ttyio.echo("currentmemberid=%r" % (currentmemberid), level="debug")
 
-  parser = OptionParser(usage="usage: %prog [options] projectid")
-  parser.add_option("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
-  parser.add_option("--debug", default=True, action="store_true", help="run %prog in debug mode")
+  parser = argparse.ArgumentParser(prog="agora")
+  parser.add_argument("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
+  parser.add_argument("--debug", default=True, action="store_true", help="run %prog in debug mode")
+  
+  bbsengine.buildargdatabasegroup(parser)
 
-  parser.add_option("--databasename", dest="databasename", action="store", default="zoidweb3", help="database name (%default)")
-  parser.add_option("--databasehost", dest="databasehost", action="store", default="localhost", help="database host (%default)")
-  parser.add_option("--databaseport", dest="databaseport", action="store", default="5432", help="database port (%default)")
-  parser.add_option("--databaseuser", dest="databaseuser", action="store", default=bbsengine.getcurrentmemberlogin(), help="database user (%default)")
-  parser.add_option("--databasepassword", dest="databasepassword", action="store", default=None, help="database password")
-
-  (opts, args) = parser.parse_args()
+  args = parser.parse_args()
 
   done = False
 
-  dbh = bbsengine.databaseconnect(opts)
+  dbh = bbsengine.databaseconnect(args)
 
   while not done:
     terminalwidth = ttyio.getterminalwidth()
     # ttyio.echo("terminalwidth=%r, calc=%r" % (terminalwidth, (terminalwidth/2-2)), level="debug")
 
-    bbsengine.title("agora (marketplace)", color="{bggray}{white}", hrcolor="{green}")
+    bbsengine.title("agora (marketplace)", titlecolor="{bggray}{white}", hrcolor="{green}")
     ttyio.echo()
     ttyio.echo("[A]dd")
     ttyio.echo("[E]dit")
     ttyio.echo("[D]elete")
-#    print "[S]earch links"
     ttyio.echo("[L]ist")
     ttyio.echo("[I]mport")
     ttyio.echo()
     ttyio.echo("[Q]uit")
-    ch = ttyio.accept("agora", "AEDLIQ", "")
+    ch = ttyio.accept("agora: ", "AEDLIQ", "")
     if ch == "Q":
       ttyio.echo("quit")
       done = True
       break
     elif ch == "A":
       ttyio.echo("add item")
-      additem(dbh, opts)
+      additem(dbh, args)
     elif ch == "E":
       ttyio.echo("edit item")
       edititem(dbh)
