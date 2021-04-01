@@ -127,7 +127,7 @@ def _edit(dbh, item, header):
       done = True
     elif ch == "T":
       ttyio.echo("title")
-      buf = bbsengine.inputstring("title: ", item["title"])
+      buf = ttyio.inputstring("title: ", item["title"])
       if buf == "":
         item["title"] = None
       else:
@@ -162,7 +162,8 @@ def _get(dbh, asin):
 def edititem(dbh):
   global currentmemberid
   
-  id = bbsengine.inputinteger("id: ")
+  # @fix: allow input of node id, asin, or imdb ids
+  id = ttyio.inputinteger("id: ")
   id = int(id)
   rec = _get(dbh, id)
   if rec is None:
@@ -171,7 +172,7 @@ def edititem(dbh):
     ttyio.echo()
     return
   item = _edit(dbh, rec, "edit item")
-  if bbsengine.inputboolean("update?") is True:
+  if ttyio.inputboolean("update?") is True:
     item["lastmodifiedby"] = currentmemberid
     item["lastmodified"] = "now()"
     bbsengine.update(dbh, "agora.__itemamzn", id, item)
@@ -203,7 +204,7 @@ def additem(dbh, opts):
     ttyio.echo("duplicate url", level="error")
     return
 
-  if bbsengine.inputboolean("add? ") is True:
+  if ttyio.inputboolean("add? ") is True:
     rec["postedby"] = currentmemberid
     rec["dateposted"] = "now()"
     rec["lastmodified"] = "now()"
