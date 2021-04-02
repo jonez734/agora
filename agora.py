@@ -134,30 +134,6 @@ def _edit(dbh, item, header):
         item["title"] = buf
   return item
 
-def _get(dbh, asin):
-  sql = "select * from agora.amznitem where attributes ->> 'asin'=%s"
-  dat = (str(asin),)
-  cur = dbh.cursor()
-  cur.execute(sql, dat)
-  res = cur.fetchall()
-  cur.close()
-  ttyio.echo("debug: res=%r" % (res), level="debug")
-  if res is None or len(res) == 0:
-    ttyio.echo()
-    ttyio.echo("invalid id", level="error")
-    ttyio.echo()
-    return None
-  rec = res[0]
-  item = {}
-  item["title"] = rec["title"]
-  item["asin"] = rec["asin"]
-  item["id"] = rec["id"]
-  item["createdbyid"] = rec["createdbyid"]
-  item["datecreated"] = rec["datecreated"]
-  item["updatedbyid"] = rec["modifiedbyid"]
-  item["dateupdated"] = rec["datemodified"]
-  item["sigs"] = rec["sigs"]
-  return item
 
 def edititem(dbh):
   global currentmemberid
