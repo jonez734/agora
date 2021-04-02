@@ -217,7 +217,7 @@ def additem(dbh, opts):
   return
 
 def listitems(dbh):
-  sql = "select * from agora.itemamzn order by datecreated desc"
+  sql = "select * from agora.amznitem order by datecreated desc"
   cur = dbh.cursor()
   cur.execute(sql)
   res = cur.fetchall()
@@ -236,30 +236,27 @@ def listitems(dbh):
 
   return
 
+def bulkimport(args):
+  bbsengine.title("bulk import")
+  return
+
 def main():
-  from optparse import OptionParser
-
-  global currentmemberid
-
-  membermap = {"jam" : 1}
-
-  loginid = pwd.getpwuid(os.geteuid())[0]
-  if loginid in membermap:
-    currentmemberid = membermap[loginid]
-    ttyio.echo("** currentmemberid=%r" % (currentmemberid))
-  else:
-    ttyio.echo("uhmm... you do not exist. go away.")
-    sys.exit(-1)
-
-  ttyio.echo("currentmemberid=%r" % (currentmemberid), level="debug")
-
   parser = argparse.ArgumentParser(prog="agora")
   parser.add_argument("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
   parser.add_argument("--debug", default=True, action="store_true", help="run %prog in debug mode")
   
-  bbsengine.buildargdatabasegroup(parser)
+  defaults = {"databasename": "zoidweb4", "databasehost":"localhost", "databaseuser": None, "databaseport":15432, "databasepassword":None}
+  bbsengine.buildargdatabasegroup(parser, defaults)
 
   args = parser.parse_args()
+
+  currentmemberid = bbsengine.getcurrentmemberid()
+  if args.debug is True:
+    ttyio.echo("currentmemberid=%r" % (currentmemberid), level="debug")
+
+  if currentmemberid is None:
+    ttyio.echo("login id not found.", level="error")
+    sys.exit(-1)
 
   done = False
 
@@ -297,7 +294,7 @@ def main():
       deleteitem(dbh)
     elif ch == "I":
       ttyio.echo("bulk import")
-      pass
+      bulkimport(dbh)
 
   return
 
