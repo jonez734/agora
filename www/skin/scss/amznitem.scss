@@ -1,0 +1,37 @@
+@import "vars";
+@import "mixins";
+
+.amznitem .body .poster {
+	float: right;
+	margin: 0.50em;
+	padding: 0;
+	img {
+		margin: 0;
+		padding: 0;
+		border: 0.125em solid $blurb-header-backgroundcolor;
+		@include boxshadow();
+	}
+}
+
+.blurb.amznitemcomment .body {
+    // https://stackoverflow.com/questions/11737266/what-is-default-list-styling-css
+    ul { 
+       list-style-type: disc; 
+       list-style-position: inside; 
+    }
+    ol { 
+       list-style-type: decimal; 
+       list-style-position: inside; 
+    }
+    ul ul, ol ul { 
+       list-style-type: circle; 
+       list-style-position: inside; 
+       margin-left: 15px; 
+    }
+    ol ol, ul ol { 
+       list-style-type: lower-latin; 
+       list-style-position: inside; 
+       margin-left: 15px; 
+    }
+
+}

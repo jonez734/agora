@@ -1,0 +1,88 @@
+{$nodeid = $amznitem.id}
+{$actions = $amznitem.actions}
+{$sigs = $amznitem.sigs}
+{$attributes = $amznitem.attributes}
+{$affiliatelink = $attributes.affiliatelink}
+{$imdbid = $attributes.imdbid|default:null}
+{if isset($attributes.omdb)}
+{$omdb = $attributes.omdb}
+{else}
+{$omdb = null}
+{/if}
+{if isset($omdb.Type)}
+{$type = $omdb.Type}
+{else}
+{$type = null}
+{/if}
+{if isset($attributes.imdb)}
+{$imdb = $attributes.imdb}
+{else}
+{$imdb = null}
+{/if}
+{$poster = $omdb.Poster|default:""}
+{$breadcrumbs = $amznitem.breadcrumbs}
+
+{$checks = $attributes.checks}
+{$year = $omdb.Year|default:null}
+{$asin = $attributes.asin}
+
+{if $poster == "" || $poster === null}
+{$title = $attributes.title}
+{else}
+{$title = $omdb.Title}
+{/if}
+
+<div class="blurb amznitem agora item" data-asin="{$asin}"{if $type == "movie"} itemscope itemtype="http://schema.org/Movie"{/if}>
+{if strlen($year) > 0}
+<div class="header"><h1>{$title} ({$year})</h1></div>
+{else}
+<div class="header"><h1>{$title|var_export}</h1></div>
+{/if}
+{* <li>approved by <a href="{$smarty.const.ENGINEURL}member-detail-{$link.approvedbyid}" class="tooltip" data-contenturl="{$smarty.const.ENGINEURL}member-detail-{$link.approvedbyid}?bare">{$link.approvedbyname}</a> on {$link.dateapprovedepoch|datestamp} ({$link.dateapprovedepoch|ago} ago)</li>*}
+<div class="metadata">
+posted by <a href="{$smarty.const.ENGINEURL}member-detail-{$amznitem.createdbyid}" class="tooltip" data-contenturl="{$smarty.const.ENGINEURL}member-detail-{$amznitem.createdbyid}?tooltip">{$amznitem.createdbyname}</a> (#{$amznitem.createdbyid}) on
+<span itemscope itemtype="https://schema.org/dateCreated">{$amznitem.datecreatedepoch|datestamp}</span> ({$amznitem.datecreatedepoch|ago} ago)
+{if (count($breadcrumbs) > 0 and (isset($showsig) and $showsig==true))}
+in 
+ <ul class="inlinelist commadelimited">
+ {foreach $breadcrumbs as $crumb}
+  <li>{include file="breadcrumbs.tmpl" breadcrumbs=$crumb linklast=true itemprop=true}</li>
+ {/foreach}
+ </ul>
+{/if} {* breadcrumbs > 0 *}
+{if strlen($type) > 0}
+{$type}
+{/if}
+{if $currentmember.flags.ADMIN}
+ASIN: {$asin}
+{if count($imdb) > 0}IMDBId: {$imdbid}{/if}
+Checks: <ul class="inlinelist commadelimited">{foreach $checks as $check}<li>{$check}</li>{/foreach}</ul>
+nodeid: {$nodeid}
+{/if}
+</div> {* metadata *}
+
+<div class="body">
+{if $poster != ""}
+<div class="poster"><img src="{$poster}" alt="poster for {$title}" /></div>
+{/if}
+
+<ul class="nomargin nopadding">
+{include file="amznitem-omdb.tmpl" omdb=$omdb}
+<li>Amazon Affiliate Link: <a href="{$affiliatelink}">{$affiliatelink}</a></li>
+</ul>
+{*{$attributes|var_export}*}
+</div>
+
+{if isset($actions) and count($actions) > 0}
+<div class="footer">{include file="actions.tmpl" actions=$actions}</div>
+{/if}
+
+</div> {* blurb *}
+
+{if count($amznitem.comments) > 0}
+<ul>
+{foreach $amznitem.comments as $comment}
+<li>{include file="amznitemcomment.tmpl" comment=$comment}</li>
+{/foreach}
+</ul>
+{/if}

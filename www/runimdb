@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python3 ./imdb/imdb.py --databasehost=localhost --databaseport=15432 --asin=$1

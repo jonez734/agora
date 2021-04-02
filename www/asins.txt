@@ -1,0 +1,56 @@
+# asin, date, checks, shorturl, sigs, title
+B076H7TD38 now none https://amzn.to/2NtCcFF top.911.ed thoughtcrime 
+B006RXPT82 now omdb https://amzn.to/2MYQhro entertainment.movies good will hunting 
+B073FS7KNG now none https://amzn.to/2u6aPGL top.agora Best Maid Dill Juice - 1 Gallon and Never A Dill Moment - Pickle Juice Recipes Cookbook Bundle
+B07DJVX359 now omdb https://amzn.to/2LwsfGv top.entertainment Jeff Dunham - Spark Of Insanity
+B002U58PTQ now none https://amzn.to/2LWVu5w top.agora vernors - 12 pack cans 
+B00004YA66 now omdb https://amzn.to/2ObGwWQ top.entertainment Frequency
+B0778XWPYW now omdb https://amzn.to/2Juwlv3 top.entertainment.movies daddy's home 2
+B001BR5NH6 now omdb https://amzn.to/2PeVdsb entertainment.movies weird science
+B019EDU7XI now none https://amzn.to/2Qwkrqz entertainment.movies the forgotten man (bradley manning)
+B07J261ZFM now omdb https://amzn.to/2SvviyB 911 the creepy line
+B009DCMDVK now omdb https://amzn.to/2KSaVsC 911 9/11 Explosive Evidence - Experts Speak Out
+B06XRNMRLK now omdb https://amzn.to/2KS5hqD 911 9/11 - The Myth and The Reality
+B01BO40IDE now omdb https://amzn.to/2syqEEU 911 Dark Legacy
+B07LCRQQ4K now omdb https://amzn.to/2GbRD11 911 Fahrenheit 11/9
+B07D5KWFJ7 now omdb https://amzn.to/2C6KxYM entertainment.movies Deadpool 2
+6305840083 now omdb https://amzn.to/2I7zSBM entertainment.movies Kentucky Fried Movie
+B0713ZJ6ZW now omdb https://amzn.to/2LYSu98 entertainment.movies The Lost Arcade
+B07FSZ9TP7 now omdb https://amzn.to/2WAq4Hb entertainment.movies Mission Impossible: Fallout
+B0011EQBOS now omdb https://amzn.to/2FTsfMq entertainment.movies WarGames
+B004DZVL9W now omdb https://amzn.to/2YAtfwm entertainment.movies The A-Team
+B077H3VB76 now omdb https://amzn.to/2L3bdQm entertainment.movies Justice League
+B000XJSL9U 2019-jul-05 omdb https://amzn.to/2XQeeJK entertainment.movies Live Free or Die Hard
+B07H3NYDTR 2019-jul-09 omdb https://amzn.to/2S7INFr entertainment.magic Ben Earl Trick Artist
+B009GJBBWM 2019-jul-22 omdb https://amzn.to/2SxcGz8 entertainment.007 octopussy
+B009GIYGFW 2019-jul-22 omdb https://amzn.to/2XUPhxI entertainment.007 a view to a kill
+B009GEF8HG 2019-jul-25 omdb https://amzn.to/2LEmyGP entertainment.007 diamonds are forever
+B000VHZH96 2019-aug-02 omdb https://amzn.to/31b3eEN entertainment.movies Walking Tall
+B000PH40F4 2019-aug-03 omdb https://amzn.to/2yyrAfF entertainment.movies Smokin' Aces
+B07DJDJC49 2019-aug-03 omdb https://amzn.to/2yvNC2z computers Atari: Game Over
+B073Q7KH52 2019-aug-03 omdb https://amzn.to/2KmYntp computers Easy to Learn, Hard to Master: The Fate of Atari
+B073GGSMK7 2019-aug-04 omdb https://amzn.to/2KctDMW 911,communications_and_networking Code 2600
+B000N5F6PG 2019-aug-04 omdb https://amzn.to/2T6ZmBP entertainment.movies Ghost
+B00X9LNFBI 2019-aug-04 none https://amzn.to/2Kh24lN entertainment.movies Sixth Sense
+B000I0EOLI 2019-aug-04 omdb https://amzn.to/31mgO8D entertainment.movies Mission: Impossible III
+B00A2FSSHK 2019-aug-05 omdb https://amzn.to/2YKxXuU entertainment.movies Minority Report
+B001K3K5MO 2019-aug-06 omdb https://amzn.to/2YDQhH3 entertainment.movies Top Gun
+B001JI5DRC 2019-aug-06 omdb https://amzn.to/2Td5Dw5 entertainment.movies Apollo 13 (Tom Hanks)
+B07J2V85WZ 2019-aug-09 omdb https://amzn.to/2KoKqfD entertainment.movies Venom
+B078H1HJ32 2019-aug-10 none https://amzn.to/2YYM63I agora Party Bargains Mini Red Disposable Shot Glasses | Plastic Shot Cups, Jello Shots, Jager Bomb, Beer Pong, Perfect Size for Serving Condiments, Snacks, Samples and Tastings - 2oz | Pack of 120. 
+B01CF2O6AK 2019-aug-19 omdb https://amzn.to/2Zf2ltw entertainment.movies The Philadelphia Experiment
+B07FR36NK4 2019-aug-23 none https://amzn.to/2KR8WpZ agora Tenergy Renair Air Purifier, True HEPA Filter, Ultra Quiet Air Cleaner, Odor Allergies Eliminator, Home Air Purifier for Smokers, Dust, Mold, Germ, Guardian Touch Control with Night Light
+B07F461W1H 2019-aug-23 none https://amzn.to/31WLk9e agora Replacement Filter for Renair
+B01EXR6C8Y 2019-aug-25 omdb https://amzn.to/328ols1 entertainment.movies Iron Man 2
+B00005JN0T 2019-sep-10 omdb https://amzn.to/2IcTYJx entertainment.movies I, Robot
+B000GJPL1S 2019-sep-10 omdb https://amzn.to/2LogZuN entertainment.movies The Matrix
+B001AH6ZWY 2019-sep-11 omdb https://amzn.to/31fm9ik entertainment.movies Contact
+B075R41C9Q 2019-sep-11 omdb https://amzn.to/2A7ARvX entertainment.movies Flatliners
+B07RN1TG2S 2019-sep-11 none https://amzn.to/2NXdCMY 911 Psywar - The Real Battlefield Is The Mind
+B07193QPTX 2019-sep-11 none https://amzn.to/2LPE88m psyche The Quantum Hologram and ESP - Astronaut Edgar Mitchell
+B07V2JKQVM 2019-sep-11 none https://amzn.to/2Ltgf7R entertainment.star_trek Star Trek VII: First Contact
+B003DPC4HQ 2019-sep-13 imdb https://amzn.to/2Lu707a entertainment The A-Team: The Complete Series
+B0044WUIHA 2019-sep-14 omdb https://amzn.to/3004AGo entertainment.movies Cast Away
+B07MJBK39N 2019-sep-15 omdb https://amzn.to/34NF3ir entertainment.movies The Challenger Disaster
+B000IJ79V6 2019-sep-19 omdb,imdb https://amzn.to/309Ftkw entertainment.movies Superman II
+B005HF0GKC 2019-sep-19 none https://amzn.to/2LCIWzg entertainment,psyche Medium

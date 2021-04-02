@@ -1,0 +1,22 @@
+AuthName "agorademo"
+#AuthType Basic
+#AuthBasicProvider file
+#AuthUserFile /srv/www/vhosts/agora.zoidtechnologies.com/.htpasswd
+
+#Order Deny,Allow
+#Satisfy any
+#Deny from all
+# Require valid-user
+
+RewriteEngine On
+
+RewriteRule ^about[/]?$ /page.php?name=about [last]
+# RewriteRule ^currencies[/]?$ /currencies.php [last]
+# RewriteRule ^market[/]?$ /market.php [last]
+# RewriteRule ^exchange[/]?$ /exchange.php [last]
+# RewriteRule ^amznitem-(lookup|edit)-([a-zA-Z0-9]+)[/]?$ /amznitem.php?mode=$1&asin=$2 [last]
+RewriteRule ^amznitem-edit-([0-9]+)$ /amznitem.php?mode=edit&nodeid=$1 [last]
+RewriteRule ^amznitem-add[/]?$ /amznitem.php?mode=add [last]
+RewriteRule ^amznitemcomment-add-([0-9]+)[/]?$ /amznitemcomment.php?mode=add&parentid=$1 [last]
+RewriteRule ^amznitemcomment-edit-([0-9]+)[/]?$ /amznitemcomment.php?mode=edit&nodeid=$1 [last]
+RewriteRule ^index-([\d]+)$ /index.php?pageID=$1 [last,qsappend]

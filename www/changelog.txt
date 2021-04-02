@@ -1,0 +1,35 @@
+commit 01ed6f1306887d978d2895b29991be4a73a00069
+Author: Jeff MacDonald <jam@zoidtechnologies.com>
+Date:   Sun Feb 14 21:52:38 2021 -0500
+
+    zoidweb4/sites/achilles/skin/tmpl/changelog and index .tmpl: added ref to disodium guanylate
+
+commit 8fd65fdd6d91c5ca1a71e7f478574e59bbea0a84
+Author: Jeff MacDonald <jam@zoidtechnologies.com>
+Date:   Sun Feb 14 20:51:58 2021 -0500
+
+    zoidweb4/sites/achilles/: restored from thumbdrive backup.
+
+commit 36daba79e894d02a611f55c6e6aea425d24d3bc9
+Author: Jeff MacDonald <jam@zoidtechnologies.com>
+Date:   Sun Jan 10 22:11:29 2021 -0500
+
+    zoidweb4/sites/engine/: added.
+
+commit 25554ce94c47892b118163f6c7a9705d17ca8484
+Author: Jeff MacDonald <jam@zoidtechnologies.com>
+Date:   Sun Jan 10 20:50:33 2021 -0500
+
+    zoidweb4/sites/agora/imdb/: added imdb.py, imdbtsv.py, and tvseries.txt.
+
+commit 71582741786be28633055c5df7b885056ca3b74a
+Author: Jeff MacDonald <jam@zoidtechnologies.com>
+Date:   Sun Jan 10 16:26:34 2021 -0500
+
+    zoidweb4/Makefile: added.
+
+commit 8011d5b7b89c9759b1e028ebe9c6882f1c87e23a
+Author: Jeff MacDonald <jam@zoidtechnologies.com>
+Date:   Sun Jan 10 16:20:36 2021 -0500
+
+    zoidweb4/sites/casino/: added.

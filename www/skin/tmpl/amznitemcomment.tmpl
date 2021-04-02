@@ -1,0 +1,37 @@
+{*<pre>comment={$comment|var_export}</pre>*}
+{$actions = $comment.actions}
+{$asin = $comment.asin}
+{$datewatchedepoch = $comment.datewatchedepoch}
+{$watchmethod = $comment.watchmethod}
+{$dateupdatedepoch = $comment.dateupdatedepoch}
+{$datecreatedepoch = $comment.datecreatedepoch}
+{$createdbyid = $comment.createdbyid}
+{$createdbyname = $comment.createdbyname|default:"a. nonymous"}
+{$replies = $comment.replies|default:null}
+<div class="blurb amznitemcomment">
+<div class="metadata">
+posted by {$createdbyname} (#{$createdbyid}) on {$datecreatedepoch|datestamp}
+{if $datewatchedepoch > 0 || strlen($watchmethod) > 0}watched{/if}
+{if $datewatchedepoch > 0} on {$datewatchedepoch|datestamp} ({$datewatchedepoch|ago} ago){/if}
+{if strlen($watchmethod) > 0} via {$watchmethod}{/if}
+{if $dateupdatedepoch > $datecreatedepoch} edited
+  {if $currentmember.flags.ADMIN} on {$dateupdatedepoch|datestamp} ({$dateupdatedepoch|ago} ago){/if}
+{/if}
+{if $currentmember.flags.ADMIN} asin={$asin} nodeid={$comment.id} datewatchedepoch={$datewatchedepoch|var_export} dateupdatedepoch={$dateupdatedepoch|var_export}{/if}
+
+</div>
+<div class="body">
+{$comment.comment}
+{*<br />attributes={$attributes|var_export}*}
+</div>
+{if count($actions) > 0}
+<div class="footer">{include file="actions.tmpl" actions=$actions}</div>
+{/if}
+</div>
+{if count($replies) > 0}
+<ul>
+{foreach $replies as $reply}
+<li>{include file="amznitemcomment.tmpl" comment=$reply}</li>
+{/foreach}
+</ul>
+{/if}
