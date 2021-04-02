@@ -226,9 +226,10 @@ def listitems(dbh):
     return
 
   for rec in res:
-    buf = "[%s] <%s> %s" % (rec["asin"], rec["affiliatelink"], rec["title"]) # rec["sigs"]?
+    siglist = bbsengine.postgres_to_python_list(rec["sigs"])
+    sigs = ttyio.readablelist(siglist, sepcolor="{white}", itemcolor="{yellow}")
+    buf = "[%s] <%s> %s{f6}sigs: %s{/all}" % (rec["asin"], rec["affiliatelink"], rec["title"], sigs)
     ttyio.echo(buf)
-
   return
 
 def bulkimport(args):
