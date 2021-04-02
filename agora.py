@@ -221,18 +221,13 @@ def listitems(dbh):
   cur = dbh.cursor()
   cur.execute(sql)
   res = cur.fetchall()
-  if len(res) > 0:
-    listfn = os.tempnam(None, "agora")
-    fp = open(listfn, "w")
-    for rec in res:
-      attributes = rec["attributes"]
-      fp.write("[%s] <%s> %s %s" % (attributes["asin"], attributes["url"], rec["sigs"], attributes["title"]))
-      fp.write("\n")
-    fp.close()
-    os.system("LESSECURE=1 less %s" % (listfn))
-    os.remove(listfn)
-  else:
+  if len(res) == 0:
     ttyio.echo("no amznitems")
+    return
+
+  for rec in res:
+    buf = "[%s] <%s> %s" % (rec["asin"], rec["affiliatelink"], rec["title"]) # rec["sigs"]?
+    ttyio.echo(buf)
 
   return
 
