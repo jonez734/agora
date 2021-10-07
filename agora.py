@@ -10,8 +10,7 @@ import psycopg2, psycopg2.extras
 
 import ttyio4 as ttyio
 import bbsengine4 as bbsengine
-
-currentmemberid = None
+import libagora
 
 def updatesigs(dbh, itemid, sigstr):
   lst = sigstr.split(",")
@@ -44,31 +43,6 @@ def _delete(dbh, table, id):
   cur.close()
   return
   
-def _update(dbh, table, id, dict):
-  global currentmemberid
-  
-  if dict.has_key("id"):
-    del dict["id"]
-  
-  dict["lastmodified"] = "now()"
-  dict["lastmodifiedby"] = currentmemberid
-  
-  sql = "update %s set " % (table)
-  params = ()
-  dat = ()
-  for k, v in dict.items():
-    params += ("%s=%%s" % (k),)
-    dat += (v,)
-
-  sql += ", ".join(params)
-  sql += " where id=%s" % (id)
-
-  cur = dbh.cursor()
-  ret = cur.execute(sql, dat)
-  dbh.commit()
-  cur.close()
-  return ret
-
 def _edit(dbh, item, header):
   dirty = False
   done = False
@@ -135,12 +109,28 @@ def _edit(dbh, item, header):
   return item
 
 
-def edititem(dbh):
-  global currentmemberid
-  
+def edititem(args, dbh):
+  currentmemberid = bbsengine.getcurrentmemberid()
+
   # @fix: allow input of node id, asin, or imdb ids
-  id = ttyio.inputinteger("id: ")
-  id = int(id)
+  id = ttyio.inputstring("asinid, imdbid, or nodeid: ", multiple=False, noneok=True)
+  sql = "select id from agora.amznitem where asin=%s or imdbid=%s"
+  dat = [id, id]
+  if type(id) == int:
+    sql+=" or id=%s"
+    dat+= [id]
+
+  cur = dbh.cursor()
+  cur.execute(sql, dat)
+  rec = cur.fetchone()
+  ttyio.echo("rec=%r" % (rec), interpret=False)
+  if rec is None:
+    ttyio.echo("unknown amazon item.")
+    return
+
+  item = libagora.getamznitem(args, dbh, rec["id"])
+  ttyio.echo("item=%r" % (item), interpret=False)
+  return
   rec = _get(dbh, id)
   if rec is None:
     ttyio.echo()
@@ -152,6 +142,7 @@ def edititem(dbh):
     item["lastmodifiedby"] = currentmemberid
     item["lastmodified"] = "now()"
     bbsengine.update(dbh, "agora.__itemamzn", id, item)
+    dbh.commit()
   return
 
 def additem(dbh, opts):
@@ -192,7 +183,7 @@ def additem(dbh, opts):
     dbh.commit()
   return
 
-def listitems(dbh):
+def listitems(args, dbh):
   sql = "select * from agora.amznitem order by datecreated desc"
   cur = dbh.cursor()
   cur.execute(sql)
@@ -206,6 +197,16 @@ def listitems(dbh):
     sigs = ttyio.readablelist(siglist, sepcolor="{white}", itemcolor="{yellow}")
     buf = "[%s] <%s> %s{f6}sigs: %s{/all}" % (rec["asin"], rec["affiliatelink"], rec["title"], sigs)
     ttyio.echo(buf)
+    ch = ttyio.getch(noneok=True, echoch=False, timeout=0.005)
+    if ch == "/" or ch == "Q" or ch == "q":
+        ttyio.echo("{bggray}{white} *aborted* {/all}")
+        break
+    elif ch == " ":
+        ch = ttyio.inputchar("{bggray}{white} *paused* {/all}", "Q/ ", "", echoch=False)
+        ttyio.echo("{CHA}{EL}", end="")
+        if ch == "Q" or ch == "/":
+            ttyio.echo("{bggray}{white} *aborted* {/all}")
+            break
   return
 
 def bulkimport(args):
@@ -244,7 +245,7 @@ def main():
     ttyio.echo("[E]dit")
     ttyio.echo("[D]elete")
     ttyio.echo("[L]ist")
-    ttyio.echo("[I]mport")
+    # ttyio.echo("[I]mport")
     ttyio.echo()
     ttyio.echo("[Q]uit")
     ch = ttyio.accept("agora: ", "AEDLIQ", "")
@@ -254,19 +255,19 @@ def main():
       break
     elif ch == "A":
       ttyio.echo("add item")
-      additem(dbh, args)
+      additem(args, dbh)
     elif ch == "E":
       ttyio.echo("edit item")
-      edititem(dbh)
+      edititem(args, dbh)
     elif ch == "L":
       ttyio.echo("list items")
-      listitems(dbh)
+      listitems(args, dbh)
     elif ch == "D":
       ttyio.echo("delete item")
-      deleteitem(dbh)
+      deleteitem(args, dbh)
     elif ch == "I":
       ttyio.echo("bulk import")
-      bulkimport(dbh)
+      bulkimport(args, dbh)
 
   return
 
