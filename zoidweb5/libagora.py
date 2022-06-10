@@ -1,4 +1,4 @@
-import ttyio4 as ttyio
+import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
 def buildamznitemrecord(args, rec):
