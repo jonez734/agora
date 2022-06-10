@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python -c "import agora; agora.main()" $*
