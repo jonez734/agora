@@ -58,7 +58,7 @@ function buildamznitemfieldset($form)
     $title->addRule("required", "'Title' is a required field");
 
     $affiliatelink = $fieldset->addElement(new HTML_Quickform2_Element_InputUrl("affiliatelink", "size=60"))->setLabel("affiliate link");
-    $affiliatelink->addRule("required", "'affiliate link' is a required field");
+#    $affiliatelink->addRule("required", "'affiliate link' is a required field");
 
     $checks = $fieldset->addText("checks", "size=60")->setLabel("Checks");
     $checks->addRule("required", "'checks' is a required field");

@@ -5,7 +5,8 @@ create or replace view agora.amznitem as
         attributes->>'imdbid' as imdbid,
         attributes->>'checks' as checks,
         attributes->>'affiliatelink' as affiliatelink,
-        attributes->>'title' as title
+        attributes->>'title' as title,
+        attributes->>'storeid' as storeid
     from engine.node as n
     where (n.attributes ? 'asin' or n.attributes ? 'imdbid') and n.attributes ? 'checks' and n.attributes ? 'affiliatelink' and n.attributes ? 'title'
 ;

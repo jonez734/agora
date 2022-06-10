@@ -26,7 +26,7 @@ define("AMZNBASEURL", "http://www.amazon.com/dp/");
 define("AMZNACCESSKEY", "AKIAIMZLBJ43DU6VLIVQ");
 define("AMZNSECRETKEY", "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");
 define("AMZNVERSION", "2013-08-01");
-define("AMZNASSOCIATETAG", "zoidtechnolog-20");
+define("AMZNASSOCIATETAG", "zoidagora2022-20"); // zoidtechnolog-20");
 
 /*
  * @since 20190722
