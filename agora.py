@@ -5,12 +5,16 @@ import copy
 import string
 import tempfile
 import argparse
+# import optparse
 
 import psycopg2, psycopg2.extras
 
 import ttyio4 as ttyio
 import bbsengine4 as bbsengine
+
 import libagora
+
+currentmemberid = None
 
 def updatesigs(dbh, itemid, sigstr):
   lst = sigstr.split(",")
@@ -50,7 +54,7 @@ def _edit(dbh, item, header):
   original = copy.deepcopy(item)
   
   while not done:
-    bbsengine.title(header, titlecolor="{bggray}{white}", hrcolor="{green}")
+    bbsengine.title(header, titlecolor="{bggray}{white}", hrcolor="{darkgreen}")
 
     if item != original:
       dirty = True
@@ -113,29 +117,24 @@ def edititem(args, dbh):
   currentmemberid = bbsengine.getcurrentmemberid()
 
   # @fix: allow input of node id, asin, or imdb ids
-  id = ttyio.inputstring("asinid, imdbid, or nodeid: ", multiple=False, noneok=True)
-  sql = "select id from agora.amznitem where asin=%s or imdbid=%s"
-  dat = [id, id]
-  if type(id) == int:
-    sql+=" or id=%s"
-    dat+= [id]
+  asin = ttyio.inputstring("asin: ", multiple=False, noneok=True)
+  sql = "select id from agora.amznitem where asin=%s"
+  dat = [asin]
 
   cur = dbh.cursor()
   cur.execute(sql, dat)
   rec = cur.fetchone()
-  ttyio.echo("rec=%r" % (rec), interpret=False)
+  ttyio.echo("rec=%r" % (rec), interpret=False, level="debug")
   if rec is None:
     ttyio.echo("unknown amazon item.")
     return
 
   item = libagora.getamznitem(args, dbh, rec["id"])
-  ttyio.echo("item=%r" % (item), interpret=False)
+  ttyio.echo("item=%r" % (item), interpret=False, level="debug")
   return
   rec = _get(dbh, id)
   if rec is None:
-    ttyio.echo()
-    ttyio.echo("could not load item record")
-    ttyio.echo()
+    ttyio.echo("{f6}could not load item record{f6}")
     return
   item = _edit(dbh, rec, "edit item")
   if ttyio.inputboolean("update?") is True:
@@ -145,8 +144,8 @@ def edititem(args, dbh):
     dbh.commit()
   return
 
-def additem(dbh, opts):
-  global currentmemberid
+def additem(args, dbh):
+#  global currentmemberid
   
   item = {}
   item["id"] = None
@@ -160,9 +159,7 @@ def additem(dbh, opts):
   
   rec = _edit(dbh, item, "add item")
   if item != rec:
-    ttyio.echo()
-    ttyio.echo("** needs save **")
-    ttyio.echo()
+    ttyio.echo("{f6}** needs save **{f6}")
     
   if opts.debug is True:
     ttyio.echo("currentmemberid=%r rec=%r" % (currentmemberid, rec), level="debug")
@@ -192,16 +189,23 @@ def listitems(args, dbh):
     ttyio.echo("no amznitems")
     return
 
+  terminalheight = ttyio.getterminalheight()/2
+#  ttyio.echo("terminalheight=%d" % (terminalheight))
+#  return
+
+  ttyio.echo("{clear}{home}")
   for rec in res:
     siglist = bbsengine.postgres_to_python_list(rec["sigs"])
     sigs = ttyio.readablelist(siglist, sepcolor="{white}", itemcolor="{yellow}")
     buf = "[%s] <%s> %s{f6}sigs: %s{/all}" % (rec["asin"], rec["affiliatelink"], rec["title"], sigs)
     ttyio.echo(buf)
+    (r, c) = ttyio.getcursorposition()
+#    ttyio.echo("r=%d c=%d" % (r, c))
     ch = ttyio.getch(noneok=True, echoch=False, timeout=0.005)
     if ch == "/" or ch == "Q" or ch == "q":
         ttyio.echo("{bggray}{white} *aborted* {/all}")
         break
-    elif ch == " ":
+    elif ch == " " or r == terminalheight-1:
         ch = ttyio.inputchar("{bggray}{white} *paused* {/all}", "Q/ ", "", echoch=False)
         ttyio.echo("{CHA}{EL}", end="")
         if ch == "Q" or ch == "/":
@@ -213,18 +217,50 @@ def bulkimport(args):
   bbsengine.title("bulk import")
   return
 
-def main():
-  parser = argparse.ArgumentParser(prog="agora")
-  parser.add_argument("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
-  parser.add_argument("--debug", default=True, action="store_true", help="run %prog in debug mode")
-  
-  defaults = {"databasename": "zoidweb4", "databasehost":"localhost", "databaseuser": None, "databaseport":15432, "databasepassword":None}
+def buildargs(args=None):
+  parser = argparse.ArgumentParser("projup")
+
+  parser.add_argument("projectid", nargs="?", type=int, default=None)
+  parser.add_argument("--verbose", default=True, action="store_true", help="use verbose mode")
+  parser.add_argument("--debug", default=False, action="store_true", help="use debug mode")
+
+  defaults = {"databasename": "zoidweb5", "databasehost":"localhost", "databaseuser": None, "databaseport":5432, "databasepassword":None}
   bbsengine.buildargdatabasegroup(parser, defaults)
 
-  args = parser.parse_args()
+  return parser
+
+def main():
+#  parser = argparse.ArgumentParser("agora")
+#  parser.add_argument("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
+#  parser.add_argument("--debug", default=True, action="store_true", help="run %prog in debug mode")
+  
+#  defaults = {"databasename": "zoidweb4", "databasehost":"localhost", "databaseuser": None, "databaseport":5432, "databasepassword":None}
+#  bbsengine.buildargdatabasegroup(parser, defaults)
+
+#  args = parser.parse_args()
+  membermap = {"jam" : 1}
+  loginid = pwd.getpwuid(os.geteuid())[0]
+  if loginid in membermap:
+    currentmemberid = membermap[loginid]
+    ttyio.echo("currentmemberid=%r" % (currentmemberid), level="debug")
+  else:
+    ttyio.echo("uhmm... you do not exist", level="error")
+    sys.exit(-1)
+
+#  parser = optparse.OptionParser(usage="usage: %prog [options]")
+#  parser.add_option("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
+#  parser.add_option("--debug", default=False, action="store_true", help="run %prog in debug mode")
+#
+#  parser.add_option("--databasename", dest="databasename", action="store", default="zoidweb4", help="database name (%default)")
+#  parser.add_option("--databasehost", dest="databasehost", action="store", default="localhost", help="database host (%default)")
+#  parser.add_option("--databaseuser", dest="databaseuser", action="store", default=bbsengine.getcurrentmemberlogin(), help="database user (%default)")
+#  parser.add_option("--databaseport", dest="databaseport", action="store", default="15432")
+#  parser.add_option("--databasepassword", dest="databasepassword", action="store", default=None, help="database password")
+#
+#  (opts, args) = parser.parse_args()
 
   currentmemberid = bbsengine.getcurrentmemberid()
-  if args.debug is True:
+  if opts.debug is True:
     ttyio.echo("currentmemberid=%r" % (currentmemberid), level="debug")
 
   if currentmemberid is None:
@@ -233,7 +269,7 @@ def main():
 
   done = False
 
-  dbh = bbsengine.databaseconnect(args)
+  dbh = bbsengine.databaseconnect(opts)
 
   while not done:
     terminalwidth = ttyio.getterminalwidth()
@@ -246,9 +282,8 @@ def main():
     ttyio.echo("[D]elete")
     ttyio.echo("[L]ist")
     # ttyio.echo("[I]mport")
-    ttyio.echo()
-    ttyio.echo("[Q]uit")
-    ch = ttyio.accept("agora: ", "AEDLIQ", "")
+    ttyio.echo("{f6}[Q]uit")
+    ch = ttyio.accept("agora: ", "AEDLQ", "")
     if ch == "Q":
       ttyio.echo("quit")
       done = True
@@ -272,4 +307,17 @@ def main():
   return
 
 if __name__ == "__main__":
-  main()
+  parser = buildargs()
+  args = parser.parse_args()
+
+  ttyio.echo("{f6:3}{cursorup:3}") # {curpos:%d,0}" % (ttyio.getterminalheight()-5))
+  bbsengine.initscreen(bottommargin=1)
+
+  try:
+      main(args)
+  except KeyboardInterrupt:
+      ttyio.echo("{/all}{bold}INTR{bold}")
+  except EOFError:
+      ttyio.echo("{/all}{bold}EOF{/bold}")
+  finally:
+      ttyio.echo("{decsc}{curpos:%d,0}{el}{decrc}{reset}{/all}" % (ttyio.getterminalheight()))
