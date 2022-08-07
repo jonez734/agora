@@ -9,8 +9,8 @@ import argparse
 
 import psycopg2, psycopg2.extras
 
-import ttyio4 as ttyio
-import bbsengine4 as bbsengine
+import ttyio5 as ttyio
+import bbsengine5 as bbsengine
 
 import libagora
 
@@ -184,17 +184,18 @@ def listitems(args, dbh):
   sql = "select * from agora.amznitem order by datecreated desc"
   cur = dbh.cursor()
   cur.execute(sql)
+  if cur.rowcount > 0:
+    ttyio.echo("no amznitems")
+    return
   res = cur.fetchall()
   if len(res) == 0:
     ttyio.echo("no amznitems")
     return
 
   terminalheight = ttyio.getterminalheight()/2
-#  ttyio.echo("terminalheight=%d" % (terminalheight))
-#  return
 
-  ttyio.echo("{clear}{home}")
-  for rec in res:
+  ttyio.echo("{clear}{home}", end="")
+  for rec in bbsengine.resultiter(cur):
     siglist = bbsengine.postgres_to_python_list(rec["sigs"])
     sigs = ttyio.readablelist(siglist, sepcolor="{white}", itemcolor="{yellow}")
     buf = "[%s] <%s> %s{f6}sigs: %s{/all}" % (rec["asin"], rec["affiliatelink"], rec["title"], sigs)
@@ -229,38 +230,9 @@ def buildargs(args=None):
 
   return parser
 
-def main():
-#  parser = argparse.ArgumentParser("agora")
-#  parser.add_argument("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
-#  parser.add_argument("--debug", default=True, action="store_true", help="run %prog in debug mode")
-  
-#  defaults = {"databasename": "zoidweb4", "databasehost":"localhost", "databaseuser": None, "databaseport":5432, "databasepassword":None}
-#  bbsengine.buildargdatabasegroup(parser, defaults)
-
-#  args = parser.parse_args()
-  membermap = {"jam" : 1}
-  loginid = pwd.getpwuid(os.geteuid())[0]
-  if loginid in membermap:
-    currentmemberid = membermap[loginid]
-    ttyio.echo("currentmemberid=%r" % (currentmemberid), level="debug")
-  else:
-    ttyio.echo("uhmm... you do not exist", level="error")
-    sys.exit(-1)
-
-#  parser = optparse.OptionParser(usage="usage: %prog [options]")
-#  parser.add_option("--verbose", default=True, action="store_true", help="run %prog in verbose mode")
-#  parser.add_option("--debug", default=False, action="store_true", help="run %prog in debug mode")
-#
-#  parser.add_option("--databasename", dest="databasename", action="store", default="zoidweb4", help="database name (%default)")
-#  parser.add_option("--databasehost", dest="databasehost", action="store", default="localhost", help="database host (%default)")
-#  parser.add_option("--databaseuser", dest="databaseuser", action="store", default=bbsengine.getcurrentmemberlogin(), help="database user (%default)")
-#  parser.add_option("--databaseport", dest="databaseport", action="store", default="15432")
-#  parser.add_option("--databasepassword", dest="databasepassword", action="store", default=None, help="database password")
-#
-#  (opts, args) = parser.parse_args()
-
-  currentmemberid = bbsengine.getcurrentmemberid()
-  if opts.debug is True:
+def main(args):
+  currentmemberid = bbsengine.getcurrentmemberid(args)
+  if args.debug is True:
     ttyio.echo("currentmemberid=%r" % (currentmemberid), level="debug")
 
   if currentmemberid is None:
@@ -275,15 +247,20 @@ def main():
     terminalwidth = ttyio.getterminalwidth()
     # ttyio.echo("terminalwidth=%r, calc=%r" % (terminalwidth, (terminalwidth/2-2)), level="debug")
 
-    bbsengine.title("agora (marketplace)", titlecolor="{bggray}{white}", hrcolor="{green}")
+    bbsengine.title("agora (marketplace, zoidweb5)", titlecolor="{bggray}{white}", hrcolor="{green}")
+    options = ""
     ttyio.echo()
-    ttyio.echo("[A]dd")
-    ttyio.echo("[E]dit")
-    ttyio.echo("[D]elete")
+    if bbsengine.checksysop(args) is True:
+      ttyio.echo("[A]dd")
+      ttyio.echo("[E]dit")
+      ttyio.echo("[D]elete")
+      options += "AED"
     ttyio.echo("[L]ist")
+    options += "L"
     # ttyio.echo("[I]mport")
     ttyio.echo("{f6}[Q]uit")
-    ch = ttyio.accept("agora: ", "AEDLQ", "")
+    options += "Q"
+    ch = ttyio.accept("agora: ", options, "")
     if ch == "Q":
       ttyio.echo("quit")
       done = True
