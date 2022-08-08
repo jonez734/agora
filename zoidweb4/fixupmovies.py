@@ -6,8 +6,6 @@ from urllib.parse import urlencode
 from optparse import OptionParser
 import requests
 
-import psycopg2, psycopg2.extras
-
 import ttyio2 as ttyio
 import bbsengine4 as bbsengine
 
