@@ -223,7 +223,7 @@ def listitems(args):
   return
 
 def importitems(args):
-  bbsengine.title("bulk import")
+  bbsengine.title("import items")
 
   dbh = bbsengine.databaseconnect(args)
 
@@ -256,7 +256,7 @@ def importitems(args):
       if libagora.getitembyasin(args, item["asin"]) is not None:
         ttyio.echo("%r is already in database." % (item["asin"]))
         continue
-      
+
       node = {}
       node["prg"] = "agora.item"
       node["attributes"] = item
@@ -271,12 +271,12 @@ def importitems(args):
       comment["parentid"] = nodeid
       comment["datewatched"] = datewatched
       comment["watchmethod"] = fields[4]
-      
+
       commentid = libagora.insertcomment(args, comment)
   if args.debug is True:
     ttyio.echo("calling commit")
   dbh.commit()
-      
+
   return
 
 def queryomdb(args):
