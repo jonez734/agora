@@ -1,13 +1,13 @@
-create or replace view agora.amznitemcomment as
+create or replace view agora.comment as
     select
         n.*,
-        n.attributes->>'asin' as asin,
         extract(epoch from (n.attributes->>'datewatched')::timestamptz) as datewatchedepoch,
         n.attributes->>'datewatched' as datewatched,
         n.attributes->>'watchmethod' as watchmethod,
         n.attributes->>'comment' as comment
     from engine.node as n
-    where attributes ? 'datewatched' and attributes ? 'watchmethod' and attributes ? 'comment'
+    where n.prg = 'agora.comment'
+    --where attributes ? 'datewatched' and attributes ? 'watchmethod' and attributes ? 'comment'
 ;
 
-grant select on agora.amznitemcomment to apache;
+grant select on agora.comment to apache;
