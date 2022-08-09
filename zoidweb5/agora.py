@@ -2,21 +2,24 @@ import os
 import pwd
 import sys
 import copy
+import time
+import json
+import locale
 import string
 import tempfile
 import argparse
-# import optparse
-
-import psycopg2, psycopg2.extras
 
 import ttyio5 as ttyio
 import bbsengine5 as bbsengine
+from getdate import getdate
 
 import libagora
 
 currentmemberid = None
 
-def updatesigs(dbh, itemid, sigstr):
+def updatesigs(args, itemid, sigstr):
+  dbh = bbsengine.databaseconnect(args)
+
   lst = sigstr.split(",")
   sigs = []
   for slp in lst:
@@ -47,14 +50,16 @@ def _delete(dbh, table, id):
   cur.close()
   return
   
-def _edit(dbh, item, header):
+def _edit(args, item, header):
   dirty = False
   done = False
-  
+
   original = copy.deepcopy(item)
-  
+
+  dbh = bbsengine.databaseconnect(args)
+
   while not done:
-    bbsengine.title(header, titlecolor="{bggray}{white}", hrcolor="{darkgreen}")
+    bbsengine.title(header)#, titlecolor="{bggray}{white}", hrcolor="{darkgreen}")
 
     if item != original:
       dirty = True
@@ -113,30 +118,31 @@ def _edit(dbh, item, header):
   return item
 
 
-def edititem(args, dbh):
-  currentmemberid = bbsengine.getcurrentmemberid()
+def edititem(args):
+  currentmemberid = bbsengine.getcurrentmemberid(args)
 
   # @fix: allow input of node id, asin, or imdb ids
   asin = ttyio.inputstring("asin: ", multiple=False, noneok=True)
-  sql = "select id from agora.amznitem where asin=%s"
+  sql = "select id from agora.item where asin=%s"
   dat = [asin]
 
+  dbh = bbsengine.databaseconnect(args)
   cur = dbh.cursor()
   cur.execute(sql, dat)
   rec = cur.fetchone()
   ttyio.echo("rec=%r" % (rec), interpret=False, level="debug")
   if rec is None:
-    ttyio.echo("unknown amazon item.")
+    ttyio.echo("unknown amazon item.", level="error")
     return
 
-  item = libagora.getamznitem(args, dbh, rec["id"])
+  item = libagora.getitem(args, dbh, rec["id"])
   ttyio.echo("item=%r" % (item), interpret=False, level="debug")
   return
   rec = _get(dbh, id)
   if rec is None:
-    ttyio.echo("{f6}could not load item record{f6}")
+    ttyio.echo("could not load item record", level="error")
     return
-  item = _edit(dbh, rec, "edit item")
+  item = _edit(args, rec, "edit item")
   if ttyio.inputboolean("update?") is True:
     item["lastmodifiedby"] = currentmemberid
     item["lastmodified"] = "now()"
@@ -144,35 +150,34 @@ def edititem(args, dbh):
     dbh.commit()
   return
 
-def additem(args, dbh):
+def additem(args):
 #  global currentmemberid
   
   item = {}
   item["id"] = None
-  item["url"] = None
   item["title"] = None
-  item["description"] = None
   item["approved"] = False
-  item["sigs"] = ["top"]
+  item["sigs"] = ["top.agora"]
   item["asin"] = None
-  item["type"] = "amznaffil"
+  item["imdb"] = None
+  item["affiliatelink"] = None
   
-  rec = _edit(dbh, item, "add item")
+  rec = _edit(args, item, "add item")
   if item != rec:
     ttyio.echo("{f6}** needs save **{f6}")
     
   if opts.debug is True:
     ttyio.echo("currentmemberid=%r rec=%r" % (currentmemberid, rec), level="debug")
 
-  if urlexists(dbh, opts, item["url"]) is True:
-    ttyio.echo("duplicate url", level="error")
-    return
+#  if urlexists(args, opts, item["url"]) is True:
+#    ttyio.echo("duplicate url", level="error")
+#    return
 
   if ttyio.inputboolean("add? ") is True:
-    rec["postedby"] = currentmemberid
+    rec["createdbyid"] = currentmemberid
     rec["dateposted"] = "now()"
     rec["lastmodified"] = "now()"
-    rec["lastmodifiedby"] = currentmemberid
+    rec["lastmodifiedbyid"] = currentmemberid
     
     if rec.has_key("id"):
       del rec["id"]
@@ -180,43 +185,116 @@ def additem(args, dbh):
     dbh.commit()
   return
 
-def listitems(args, dbh):
-  sql = "select * from agora.amznitem order by datecreated desc"
+def listitems(args):
+  dbh = bbsengine.databaseconnect(args)
+  sql = "select * from agora.item order by datecreated desc"
   cur = dbh.cursor()
   cur.execute(sql)
-  if cur.rowcount > 0:
-    ttyio.echo("no amznitems")
-    return
-  res = cur.fetchall()
-  if len(res) == 0:
-    ttyio.echo("no amznitems")
+  if cur.rowcount == 0:
+    ttyio.echo("no items")
     return
 
-  terminalheight = ttyio.getterminalheight()/2
-
-  ttyio.echo("{clear}{home}", end="")
   for rec in bbsengine.resultiter(cur):
     siglist = bbsengine.postgres_to_python_list(rec["sigs"])
-    sigs = ttyio.readablelist(siglist, sepcolor="{white}", itemcolor="{yellow}")
-    buf = "[%s] <%s> %s{f6}sigs: %s{/all}" % (rec["asin"], rec["affiliatelink"], rec["title"], sigs)
+    sigs = ttyio.readablelist(siglist, sepcolor="{var:labelcolor}", itemcolor="{var:valuecolor}")
+    omdb = rec["omdb"] if "omdb" in rec else None
+    if type(omdb) is str:
+      omdb = json.loads(omdb)
+    if omdb is not None:
+      ttyio.echo("omdb=%r" % (omdb), level="debug")
+      title = "%s (%s) [%s]" % (omdb["Title"], omdb["Year"], omdb["Rated"])
+    else:
+      title = rec["title"]
+    buf = "{var:valuecolor}%s {var:labelcolor}posted to {var:valuecolor}%s {var:labelcolor}by {var:valuecolor}%s {var:labelcolor}on {var:valuecolor}%s {var:labelcolor}shop: <{var:valuecolor}%s{var:labelcolor}>" % (title, sigs, rec["createdbyname"], rec["datecreated"], rec["affiliatelink"])
     ttyio.echo(buf)
-    (r, c) = ttyio.getcursorposition()
-#    ttyio.echo("r=%d c=%d" % (r, c))
-    ch = ttyio.getch(noneok=True, echoch=False, timeout=0.005)
-    if ch == "/" or ch == "Q" or ch == "q":
-        ttyio.echo("{bggray}{white} *aborted* {/all}")
-        break
-    elif ch == " " or r == terminalheight-1:
-        ch = ttyio.inputchar("{bggray}{white} *paused* {/all}", "Q/ ", "", echoch=False)
-        ttyio.echo("{CHA}{EL}", end="")
-        if ch == "Q" or ch == "/":
-            ttyio.echo("{bggray}{white} *aborted* {/all}")
-            break
+    if omdb is not None:
+      ttyio.echo("{var:labelcolor}plot: {var:valuecolor}%s" % (omdb["Plot"]))
+      ttyio.echo("{var:labelcolor}awards: {var:valuecolor}%s" % (omdb["Awards"]))
+
+      actors = omdb["Actors"].split(", ")
+      actors = [x.strip() for x in actors]
+      buf = ttyio.readablelist(actors, sepcolor="{var:labelcolor}", itemcolor="{var:valuecolor}")
+      ttyio.echo("{var:labelcolor}actors: {var:valuecolor}%s" % (buf))
+      imdbrating = omdb["imdbRating"]
+      imdbvotes = omdb["imdbVotes"]
+      ttyio.echo("{var:labelcolor}imdb: {var:valuecolor}%s {var:labelcolor}with {var:valuecolor}%s votes" % (imdbrating, imdbvotes))
+    ttyio.echo(bbsengine.hr(color="{var:hrcolor}"))
+
   return
 
-def bulkimport(args):
+def importitems(args):
   bbsengine.title("bulk import")
+
+  dbh = bbsengine.databaseconnect(args)
+
+  filename = "queue.txt"
+  with open(filename) as f:
+    for buf in f:
+      if buf == "":
+          done = True
+          break
+      buf = buf.strip()
+      i = buf.find("#")
+      if i >= 0:
+          buf = buf[:i]
+      if buf == "":
+          continue
+      fields = buf.split()
+      fields = [f for f in fields if f != ""]
+      if len(fields) < 5:
+          ttyio.echo("syntax error, incorrect number of fields")
+          return
+      item = {}
+      item["affiliatelink"] = fields[1]
+      item["asin"] = fields[2]
+      item["imdbid"] = fields[3]
+      item["title"] = " ".join(fields[5:])
+      item["type"] = "movie"
+      if args.debug is True:
+        ttyio.echo("item=%r" % (item), level="debug")
+      
+      if libagora.getitembyasin(args, item["asin"]) is not None:
+        ttyio.echo("%r is already in database." % (item["asin"]))
+        continue
+      
+      node = {}
+      node["prg"] = "agora.item"
+      node["attributes"] = item
+      nodeid = libagora.insertitem(args, item, mogrify=True)
+      ttyio.echo("nodeid=%r" % (nodeid), level="debug")
+
+      datewatched = bbsengine.datestamp(getdate(fields[0]))
+      if datewatched == -1:
+        ttyio.echo("could not convert %r to an epoch time" % (datewatched), level="error")
+        datewatched = None
+      comment = {}
+      comment["parentid"] = nodeid
+      comment["datewatched"] = datewatched
+      comment["watchmethod"] = fields[4]
+      
+      commentid = libagora.insertcomment(args, comment)
+  if args.debug is True:
+    ttyio.echo("calling commit")
+  dbh.commit()
+      
   return
+
+def queryomdb(args):
+  dbh = bbsengine.databaseconnect(args)
+  sql = "select id, imdbid from agora.item where omdb is null limit 1"
+  cur = dbh.cursor()
+  cur.execute(sql)
+  for item in bbsengine.resultiter(cur):
+    nodeid = item["id"]
+    imdbid = item["imdbid"]
+    omdb = libagora.queryomdb(args, imdbid)
+    attributes = {}
+    attributes["omdb"] = omdb
+    bbsengine.updatenodeattributes(dbh, args, nodeid, attributes)
+  dbh.commit()
+
+def init(args=None):
+  pass
 
 def buildargs(args=None):
   parser = argparse.ArgumentParser("projup")
@@ -241,13 +319,11 @@ def main(args):
 
   done = False
 
-  dbh = bbsengine.databaseconnect(opts)
-
   while not done:
     terminalwidth = ttyio.getterminalwidth()
     # ttyio.echo("terminalwidth=%r, calc=%r" % (terminalwidth, (terminalwidth/2-2)), level="debug")
 
-    bbsengine.title("agora (marketplace, zoidweb5)", titlecolor="{bggray}{white}", hrcolor="{green}")
+    bbsengine.title("agora (amazon affiliate marketplace, zoidweb5)")
     options = ""
     ttyio.echo()
     if bbsengine.checksysop(args) is True:
@@ -255,31 +331,41 @@ def main(args):
       ttyio.echo("[E]dit")
       ttyio.echo("[D]elete")
       options += "AED"
+      ttyio.echo("[I]mport")
+      options += "I"
+      ttyio.echo("[O]mdb")
+      options += "O"
+
     ttyio.echo("[L]ist")
     options += "L"
-    # ttyio.echo("[I]mport")
     ttyio.echo("{f6}[Q]uit")
     options += "Q"
-    ch = ttyio.accept("agora: ", options, "")
+    ch = ttyio.accept("{var:promptcolor}agora: {var:inputcolor}", options, "")
     if ch == "Q":
       ttyio.echo("quit")
       done = True
       break
+    elif ch == "I":
+      ttyio.echo("import items")
+      importitems(args)
     elif ch == "A":
       ttyio.echo("add item")
-      additem(args, dbh)
+      additem(args)
     elif ch == "E":
       ttyio.echo("edit item")
-      edititem(args, dbh)
+      edititem(args)
     elif ch == "L":
       ttyio.echo("list items")
-      listitems(args, dbh)
+      listitems(args)
     elif ch == "D":
       ttyio.echo("delete item")
-      deleteitem(args, dbh)
+      deleteitem(args)
     elif ch == "I":
-      ttyio.echo("bulk import")
-      bulkimport(args, dbh)
+      ttyio.echo("import items")
+      importitems(args)
+    elif ch == "O":
+      ttyio.echo("query omdb")
+      queryomdb(args)
 
   return
 
@@ -287,8 +373,13 @@ if __name__ == "__main__":
   parser = buildargs()
   args = parser.parse_args()
 
-  ttyio.echo("{f6:3}{cursorup:3}") # {curpos:%d,0}" % (ttyio.getterminalheight()-5))
+  ttyio.echo("{f6:3}{cursorup:3}")
   bbsengine.initscreen(bottommargin=1)
+
+  locale.setlocale(locale.LC_ALL, "")
+  time.tzset()
+
+  init(args)
 
   try:
       main(args)
@@ -297,4 +388,4 @@ if __name__ == "__main__":
   except EOFError:
       ttyio.echo("{/all}{bold}EOF{/bold}")
   finally:
-      ttyio.echo("{decsc}{curpos:%d,0}{el}{decrc}{reset}{/all}" % (ttyio.getterminalheight()))
+      ttyio.echo("{decsc}{curpos:%d,0}{eraseline}{decrc}{reset}{/all}" % (ttyio.getterminalheight()))
