@@ -1,0 +1,67 @@
+#
+# date   shortlink               ASIN       IMDB      watch    title
+#
+
+20220514 https://amzn.to/3QajDUn B0091W0ILY tt0094721 hbomax   beetlejuice
+
+20220608 https://amzn.to/398FsmG B08FRVS7RC tt1086064 prime    bill & ted face the music
+20220608 https://amzn.to/3QbcOBP B008Y787W4 tt0104257 prime    A Few Good Men
+20220608 https://amzn.to/3zrlMoE B0128CX18U tt0108037 prime    sandlot
+
+20220609 https://amzn.to/3NGtj7k B00KCGR9OM tt0120660 prime    enemy of the state
+
+20220611 https://amzn.to/3xqd5bt B09K26WXZ7 tt2382320 prime    no time to die
+
+20220617 https://amzn.to/3O8c9Qj B00BR5IR1Q tt1074638 prime    skyfall
+20220617 https://amzn.to/3mV9KMT B07XWJY87K tt4044364 freevee  citizenfour
+20220617 https://amzn.to/3QyUzqu B076VYN8T6 tt6788208 freevee  meeting snowden
+
+20220618 https://amzn.to/3HxwrAm B00D5EFEOU tt0338337 prime    paycheck
+
+20220625 https://amzn.to/3HPUDy2 B00GZIHZ9K tt0078346 hbomax   superman (1978)
+
+20220626 https://amzn.to/3tZDxYI B0091XT0YE tt0086393 prime    superman 3 (1983)
+
+20220702 https://amzn.to/3nwNxoG B0091X7F00 tt0348150 prime    superman returns (2006)
+
+20220716 https://amzn.to/3uTpSD1 B009GJBCW6 tt0086034 prime    james bond octupussy (1983)
+
+20220717 https://amzn.to/3PdYDva B07JL95CXR tt0090264 prime    a view to a kill (1985)
+20220717 https://amzn.to/3d0NAae B07K6X4BQ2 tt0082398 prime    for your eyes only (1981)
+
+20220725 https://amzn.to/3BfyhEG B07Z4V43J4 tt3350362 prime    shadow government (2009)
+
+20220806 https://amzn.to/3Q3XMxB B00AA2UO0E tt0181689 showtime minority report (2002)
+20220806 https://amzn.to/3Qp0ZY5 B08TRXWCDC tt0258463 hbomax   bourne identity (2002)
+20220806 https://amzn.to/3PZaVb3 B001FD5KJM tt0371746 fxm      iron man (2008)
+
+20220810 https://amzn.to/3AdUpP5 B09R51N7MB tt15387998 prime   9/11: Minute by Minute (2021)
+20220810 https://amzn.to/3Qhbg9d B07Q98P842 tt14115592 prime   Black Hawk Down: The Untold Story (2019)
+
+20220811 https://amzn.to/3Pl0LjT B07KT997BK tt1977094  prime   beyond white space (2018)
+
+20220812 https://amzn.to/3dv53rO B000HZGNEU tt0092007  prime star trek 4: the voyage home (1986)
+20220812 https://amzn.to/3QF4olF B09841JDSY ---        prime paranormal (2009)
+
+20220814 https://amzn.to/3bUK0hT B076QL45JN tt7312940  starz singularity (2017)
+
+20220816 https://amzn.to/3PI4fNL B008Y6ULCY tt0100802 hbomax total recall (1990)
+
+20220823 https://amzn.to/3pDKJHr B017345J1K tt0785036 aetv   paranormal state (2008)
+
+20220824 https://amzn.to/3R6Nr42 B00005N5S5 tt0088247 showtime the terminator (1984)
+20220824 https://amzn.to/3CvIIVw B000VMYCBA tt0112864 starz die hard with a vengeance (1995)
+
+20220825 https://amzn.to/3ThH4fR B001XULSG6 tt0117731 starz star trek: first contact (1996)
+20220825 https://amzn.to/3PRmhNB B00A34LX2M tt2095605 starz Seal Team Six: The Raid On Osama Bin Laden (2012)
+20220825 https://amzn.to/3QU4oyK B00498XR9U tt0088763 paramount back to the future (1985)
+20220825 https://amzn.to/3QUBdLW B00498YYCE ---       back to the future part 2 (1989)
+
+20220828 https://amzn.to/3KtNFjx B000U6BT40 tt0796264 prime eureka (tv series) (2006)
+
+20220904 starz aliens
+20220904 https://amzn.to/3KLMRGM B003ZA0C5U starz final destination (2000)
+20220904 https://amzn.to/3wVZyJj B00ABD0HF4 starz final destination 2 (2003)
+
+
+
