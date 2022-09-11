@@ -6,13 +6,13 @@ define("SITEADMINEMAIL", "jam <jam@zoidtechnologies.com>");
 /**
  * define the base url for the site. THIS VALUE MUST BE TERMINATED WITH A "/"
  */
-define("SITEURL", "http://agora.zoidtechnologies.com/");
+define("SITEURL", "https://agora.zoidtechnologies.com/");
 define("SKINURL", SITEURL . "skin/");
 // define("SYSTEMDSN", "pgsql://apache@localhost/zoidweb2");
 define("VHOSTDIR", "/srv/www/vhosts/agora.zoidtechnologies.com/");
-define("DOCUMENTROOT", VHOSTDIR . "80/html/");
+define("DOCUMENTROOT", VHOSTDIR . "html/");
 
-define("IMAGESURL", "http://static.zoidtechnologies.com/");
+define("IMAGESURL", "https://static.zoidtechnologies.com/");
 
 define("SMARTYCOMPILEDTEMPLATESDIR", VHOSTDIR . "templates_c"); 
 define("SMARTYPLUGINSDIR", VHOSTDIR . "smarty/");
@@ -31,9 +31,9 @@ define("AMZNASSOCIATETAG", "zoidagora2022-20"); // zoidtechnolog-20");
 /*
  * @since 20190722
  */
-$includepath = get_include_path();
-$zoidweb4 = str_replace("zoidweb3", "zoidweb4", $includepath);
-set_include_path($zoidweb4);
+//$includepath = get_include_path();
+//$zoidweb4 = str_replace("zoidweb3", "zoidweb4", $includepath);
+//set_include_path($zoidweb4);
 
 /**
  * @since 20200413
