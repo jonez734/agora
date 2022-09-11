@@ -4,26 +4,26 @@ require_once("InputDate.php");
 require_once("InputUrl.php");
 
 /**
- * return the count of amznitems to which the current user has access
+ * return the count of items to which the current user has access
  *
  * @since 20200412
  * @return integer
  */
-function getamznitemcount()
+function getitemcount()
 {
     $dbh = dbconnect(SYSTEMDSN);
-    $sql = "select asin from agora.amznitem";
+    $sql = "select asin from agora.item";
     $res = $dbh->getAll($sql);
     if (PEAR::isError($res))
     {
-        logentry("agora.index.getamznitemcount.100: " . $res->toString());
+        logentry("agora.index.getitemcount.100: " . $res->toString());
         return $res;
     }
 
     $count = 0;
     foreach ($res as $rec)
     {
-        if (accessamznitem("view", $rec) === true)
+        if (accessitem("view", $rec) === true)
         {
             $count++;
         }
@@ -31,23 +31,23 @@ function getamznitemcount()
     return $count;
 }
 
-function buildamznitemrecord($values)
+function builditemrecord($values)
 {
-    $amznitem = [];
-    $amznitem["asin"] = $values["asin"];
-    $amznitem["imdbid"] = $values["imdbid"];
-    $amznitem["checks"] = $values["checks"];
-    $amznitem["affiliatelink"] = $values["affiliatelink"];
-    $amznitem["title"] = $values["title"];
+    $item = [];
+    $item["asin"] = $values["asin"];
+    $item["imdbid"] = $values["imdbid"];
+    $item["checks"] = $values["checks"];
+    $item["affiliatelink"] = $values["affiliatelink"];
+    $item["title"] = $values["title"];
     
-    logentry("buildamznitemrecord.100: " . var_export($amznitem, true));
+    logentry("builditemrecord.100: " . var_export($item, true));
 
-    return $amznitem;
+    return $item;
 }
 
-function buildamznitemfieldset($form)
+function builditemfieldset($form)
 {
-    $fieldset = $form->addFieldset("amznitem")->setLabel("Amazon Item");
+    $fieldset = $form->addFieldset("item")->setLabel("Amazon Item");
 
     $asin = $fieldset->addText("asin", "size=10")->setLabel("ASIN");
     // $asin->addRule("required", "'ASIN' is a required field");
@@ -70,35 +70,35 @@ function buildamznitemfieldset($form)
     return $form;
 }
 
-function buildamznitemcommentrecord($values)
+function builditemcommentrecord($values)
 {
-    $amznitemcomment = [];
-    $amznitemcomment["comment"] = $values["comment"];
+    $itemcomment = [];
+    $itemcomment["comment"] = $values["comment"];
 
     $datewatched = $values["datewatched"];
-    logentry("buildamznitemcommentrecord.100: datewatched=".var_export($datewatched, true));
+    logentry("builditemcommentrecord.100: datewatched=".var_export($datewatched, true));
     if (is_array($datewatched) === true)
     {
-        $amznitemcomment["datewatched"] = sprintf("%s-%s-%s", $datewatched["Y"], $datewatched["F"], $datewatched["d"]);
+        $itemcomment["datewatched"] = sprintf("%s-%s-%s", $datewatched["Y"], $datewatched["F"], $datewatched["d"]);
     }
     elseif ($datewatched === "")
     {
-        $amznitemcomment["datewatched"] = null;
+        $itemcomment["datewatched"] = null;
     }
     else
     {
-        $amznitemcomment["datewatched"] = $datewatched;
+        $itemcomment["datewatched"] = $datewatched;
     }
-    $amznitemcomment["watchmethod"] = $values["watchmethod"];
-    $amznitemcomment["asin"] = $values["asin"];
-    $amznitemcomment["imdbid"] = $values["imdbid"];
+    $itemcomment["watchmethod"] = $values["watchmethod"];
+    $itemcomment["asin"] = $values["asin"];
+    $itemcomment["imdbid"] = $values["imdbid"];
 
-    return $amznitemcomment;
+    return $itemcomment;
 }
 
-function buildamznitemcommentfieldset($form)
+function builditemcommentfieldset($form)
 {
-    $fieldset = $form->addFieldset("amznitemcomment")->setLabel("Amazon Item Comment");
+    $fieldset = $form->addFieldset("itemcomment")->setLabel("Amazon Item Comment");
     $fieldset->addHidden("asin");
     $fieldset->addHidden("parentid");
     $watchmethod = $fieldset->addText("watchmethod")->setLabel("Watch Method");
@@ -109,16 +109,16 @@ function buildamznitemcommentfieldset($form)
     return $form;
 }
 
-function getamznitemcomments($parentid)
+function getitemcomments($parentid)
 {
     $dbh = dbconnect(SYSTEMDSN);
     if (PEAR::isError($dbh))
     {
-      logentry("libagora.getamznitemcomments.100: " . $dbh->toString());
+      logentry("libagora.getitemcomments.100: " . $dbh->toString());
       return $dbh;
     }
 
-    $sql = "select * from agora.amznitemcomment where parentid=".$dbh->quote($parentid, "integer");
+    $sql = "select * from agora.itemcomment where parentid=".$dbh->quote($parentid, "integer");
 
     $comments = [];
 
@@ -132,11 +132,11 @@ function getamznitemcomments($parentid)
     {
         foreach ($res as $rec)
         {
-            $amznitemcomment = decodejson($rec["attributes"]);
-            if (accessamznitemcomment("view", $amznitemcomment) === true)
+            $itemcomment = decodejson($rec["attributes"]);
+            if (accessitemcomment("view", $itemcomment) === true)
             {
               $id = $rec["id"];
-              $actions = buildamznitemcommentactions($id, $amznitemcomment);
+              $actions = builditemcommentactions($id, $itemcomment);
               $rec["actions"] = $actions;
               $comments[] = $rec;
             }
@@ -146,16 +146,16 @@ function getamznitemcomments($parentid)
 }
 
 /**
- * given an operation and an amznitem dict, returns a boolean to indicate if the operation is allowed.
+ * given an operation and an item dict, returns a boolean to indicate if the operation is allowed.
  *
  * @param $op string
- * @param $amznitem dictionary
+ * @param $item dictionary
  * @param $memberid integer 
  * @since 20190811
  * @since 20200412 moved to libagora from zoidweb4
  * @return boolean
  */
-function accessamznitem($op, $amznitem, $memberid=null)
+function accessitem($op, $item, $memberid=null)
 {
     if ($memberid === null)
     {
@@ -192,54 +192,54 @@ function accessamznitem($op, $amznitem, $memberid=null)
 /**
  * builds an array of dictionaries with available actions
  *
- * @param $amznitem dictionary
+ * @param $item dictionary
  * @param $memberid integer
  * @return array
  * @since 20190811
  * @since 20200412 moved to libagora from zoidweb4
  */
-function buildamznitemactions($amznitem, $memberid=null)
+function builditemactions($item, $memberid=null)
 {
-    $asin = $amznitem["asin"];
-    $nodeid = $amznitem["id"];
+    $asin = $item["asin"];
+    $nodeid = $item["id"];
 
     $actions = [];
-    if (accessamznitem("edit", $amznitem, $memberid) === true)
+    if (accessitem("edit", $item, $memberid) === true)
     {
-      $actions[] = ["href" => AGORAURL . "amznitem-edit-{$nodeid}", "title" => "edit amznitem", "class" => "fa fa-edit fa-fw"];
+      $actions[] = ["href" => AGORAURL . "item-edit-{$nodeid}", "title" => "edit item", "class" => "fa fa-edit fa-fw"];
     }
-    if (accessamznitemcomment("add", $amznitem, $memberid) === true)
+    if (accessitemcomment("add", $item, $memberid) === true)
     {
-      $actions[] = ["href" => AGORAURL . "amznitemcomment-add-{$nodeid}", "title" => "add comment", "class" => "fa fa-comment fa-fw"];
+      $actions[] = ["href" => AGORAURL . "itemcomment-add-{$nodeid}", "title" => "add comment", "class" => "fa fa-comment fa-fw"];
     }
     return $actions;
 }
 
 /**
- * builds an array of dictionaries with available actions for the given amznitemcomment
+ * builds an array of dictionaries with available actions for the given itemcomment
  *
- * @param $amznitemcomment dictionary
+ * @param $itemcomment dictionary
  * @param $memberid integer
  * @return array
  * @since 20190811
  * @since 20200412 moved to libagora from zoidweb4
  */
-function buildamznitemcommentactions($nodeid, $amznitemcomment)
+function builditemcommentactions($nodeid, $itemcomment)
 {
 //  logentry("buildamznitemcommentactions.200: nodeid=".var_export($nodeid, true));
   
   $actions = [];
-  if (accessamznitemcomment("edit", $amznitemcomment) === true)
+  if (accessitemcomment("edit", $itemcomment) === true)
   {
-    $actions[] = ["href" => AGORAURL."amznitemcomment-edit-{$nodeid}", "title" => "edit comment", "class" => "fa fa-edit fa-fw"];
+    $actions[] = ["href" => AGORAURL."itemcomment-edit-{$nodeid}", "title" => "edit comment", "class" => "fa fa-edit fa-fw"];
   }
-  if (accessamznitemcomment("reply", $amznitemcomment) === true)
+  if (accessitemcomment("reply", $itemcomment) === true)
   {
-    $actions[] = ["href" => AGORAURL."amznitemcomment-add-{$nodeid}", "title" => "reply to comment", "class" => "fa fa-reply fa-fw"];
+    $actions[] = ["href" => AGORAURL."itemcomment-add-{$nodeid}", "title" => "reply to comment", "class" => "fa fa-reply fa-fw"];
   }
-  if (accessamznitemcomment("upvote", $amznitemcomment) === true)
+  if (accessitemcomment("upvote", $itemcomment) === true)
   {
-    $actions[] = ["href" => AGORAURL."amznitemcomment-upvote-{$nodeid}", "title" => "upvote comment", "class" => "far fa-thumbs-up"];
+    $actions[] = ["href" => AGORAURL."itemcomment-upvote-{$nodeid}", "title" => "upvote comment", "class" => "far fa-thumbs-up"];
   }
 /*
   if (accessamznitemcomment("downvote", $amznitemcomment) === true)
@@ -251,16 +251,16 @@ function buildamznitemcommentactions($nodeid, $amznitemcomment)
 }
 
 /**
- * given an operation and an amznitemcomment dict, returns a boolean to indicate if the operation is allowed.
+ * given an operation and an itemcomment dict, returns a boolean to indicate if the operation is allowed.
  *
  * @param $op string
- * @param $amznitemcomment dictionary
+ * @param $itemcomment dictionary
  * @param $memberid integer 
  * @since 20190811
  * @since 20200412 moved to libagora from zoidweb4
  * @return boolean
  */
-function accessamznitemcomment($op, $amznitemcomment, $memberid=null)
+function accessitemcomment($op, $itemcomment, $memberid=null)
 {
     if ($memberid === null)
     {
@@ -327,7 +327,7 @@ function accessamznitemcomment($op, $amznitemcomment, $memberid=null)
         default:
         {
           $res = false;
-          logentry("accessamznitemcomment.100: unknown op ".var_export($op, true));
+          logentry("accessitemcomment.100: unknown op ".var_export($op, true));
           break;
         }
     }
@@ -360,69 +360,69 @@ function buildamznitem($rec)
 */
 
 /**
- * function to get an amznitem based on the node id instead of the asin
+ * function to get an item based on the node id instead of the asin
  *
  * @since 20200419
  * @param integer $nodeid
- * @return amznitem
+ * @return item
  */
-function getamznitembynodeid($nodeid)
+function getitembynodeid($nodeid)
 {
   $dbh = dbconnect(SYSTEMDSN);
-  $sql = "select asin from agora.amznitem where id=?";
+  $sql = "select asin from agora.item where id=?";
   $dat = [$nodeid];
   $asin = $dbh->getOne($sql, ["text"], $dat, ["integer"]);
   if (PEAR::isError($asin))
   {
-    logentry("getamznitembynodeid.100: " . $res->toString());
+    logentry("getitembynodeid.100: " . $res->toString());
     return $res;
   }
-  return getamznitem($asin);
+  return getitem($asin);
 }
 
 /**
- * returns a record from agora.amznitem for the given asin. automagically decodes amznitem.attributes, assigns amznitem.sigs to a php array, and build breadcrumbs.
+ * returns a record from agora.item for the given asin. automagically decodes item.attributes, assigns item.sigs to a php array, and build breadcrumbs.
  * 
  * @since 20200419
  * @return dict
  */
-function getamznitem($asin)
+function getitem($asin)
 {
     $dbh = dbconnect(SYSTEMDSN);
     if (PEAR::isError($dbh))
     {
-        logentry("getamznitem.100: " . var_export($dbh, true));
+        logentry("getitem.100: " . var_export($dbh, true));
         return $dbh;
     }
 
-    $sql = "select * from agora.amznitem where asin=?";
+    $sql = "select * from agora.item where asin=?";
     $dat = [$asin];
-    $amznitem = $dbh->getRow($sql, null, $dat, ["text"]);
-    if (PEAR::isError($amznitem))
+    $item = $dbh->getRow($sql, null, $dat, ["text"]);
+    if (PEAR::isError($item))
     {
-        logentry("getamznitem.120: " . var_export($amznitem, true));
-        return $amznitem;
+        logentry("getitem.120: " . var_export($item, true));
+        return $item;
     }
-    if ($amznitem === null)
+    if ($item === null)
     {
-      logentry("getamznitem.130: query for asin ".var_export($asin, true)." returned null");
-      return $amznitem;
+      logentry("getitem.130: query for asin ".var_export($asin, true)." returned null");
+      return $item;
     }
 
-    $amznitem["actions"] = buildamznitemactions($amznitem);
-    $amznitem["comments"] = [];
+    $item["actions"] = builditemactions($item);
+    $item["comments"] = [];
 
-    $sigslist = postgres_to_php_array($amznitem["sigs"]);
+    $sigslist = postgres_to_php_array($item["sigs"]);
 //    logentry("getamznitem.140: sigslist=".var_export($sigslist, true));
     $breadcrumbs = [];
     foreach ($sigslist as $sig)
     {
       $breadcrumbs[] = buildbreadcrumbs($sig);
     }
-    $amznitem["breadcrumbs"] = $breadcrumbs;
-    $amznitem["sigs"] = $sigslist;
-    $amznitem["attributes"] = decodejson($amznitem["attributes"]);
-    return $amznitem;
+    $item["breadcrumbs"] = $breadcrumbs;
+    $item["sigs"] = $sigslist;
+    $item["attributes"] = decodejson($item["attributes"]);
+    return $item;
 }
 
 ?>
