@@ -32,7 +32,7 @@ function main()
     $params["append"] = false;
     $params["path"] = "/";
   
-    $pageinfo = buildpageinfo("select id as nodeid, asin from agora.amznitem where not sigs ~ 'top.eros.*' order by datecreated desc", $params);
+    $pageinfo = buildpageinfo("select id as nodeid, asin from agora.item where not sigs ~ 'top.eros.*' order by datecreated desc", $params);
 
     $currentpage = isset($_REQUEST["pageID"]) ? $_REQUEST["pageID"] : 1;
     if ($currentpage > 1 && flag("AUTHENTICATED") == true)
@@ -105,7 +105,7 @@ function main()
     }
 
 //    $sql = "select attributes->>'asin' as asin from agora.amznitem order by upper(attributes->>'title') asc";
-    $sql = "select id, asin from agora.amznitem order by datecreated desc";
+    $sql = "select id, asin from agora.item order by datecreated desc";
     $res = $dbh->getAll($sql);
     if (PEAR::isError($res))
     {
