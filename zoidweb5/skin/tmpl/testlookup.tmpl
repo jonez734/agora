@@ -1,0 +1,15 @@
+{extends file="page.tmpl"}
+{block name="head" append}
+<script src="/js/agora.js"></script>
+<link rel="stylesheet" type="text/css" href="/skin/css/pageheader.css">
+<link rel="stylesheet" type="text/css" href="/skin/css/agora.css">
+{/block}
+{block name="title"}the agora marketplace - {$smarty.block.parent}{/block}
+{block name="content"}
+{include file="rigorous-standard-for-worthiness.tmpl"}
+{include file="item.tmpl" data=$data}
+{/block}
+{block name="pageheader"}
+ <h1>agora</h1>
+ <h2>a Worthy Marketplace&#8480;</h2>
+{/block}

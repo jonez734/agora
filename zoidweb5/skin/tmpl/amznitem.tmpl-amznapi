@@ -1,0 +1,70 @@
+{if $data.usingamznapi === true}
+{$item = $data.Item[0]}
+{$request = $data.Request}
+{$image = $item.MediumImage}
+{$offersummary = $item.OfferSummary}
+{$editorialreviews = $item.EditorialReviews}
+{$editorialreview = $editorialreviews.EditorialReview[0]}
+{$itemlinks = $item.ItemLinks}
+{$itemlink = $itemlinks.ItemLink}
+{$detailpageurl = $item.DetailPageURL}
+{$attributes = $data.attributes}
+<div class="blurb agora item" data-asin="{$attributes.asin}">
+<div class="header"><h1>{$item.ItemAttributes.Title}</h1></div>
+<div class="body">
+<pre>{$item|var_export}</pre>
+<div class="image"><img src="{$image.URL}" height="{$image.Height._content}" width="{$image.Width._content}" /></div>
+{if count($editorialreview.Content) > 0}
+<p>{$editorialreview.Content}</p>
+{/if}
+{*
+{if count($offersummary) > 0}
+<ul class="nobullets inlinelist commadelimited">
+{foreach $offersummary as $k => $v}
+<li>{$k}: {$v}</li>
+{/foreach}
+</ul>
+{/if}
+*}
+<p>Lowest New Price: {$offersummary.LowestNewPrice.FormattedPrice}</p>
+Amazon:
+<ul class="nobullets inlinelist">
+<li><a href="{$detailpageurl}">Detail Page</a></li>
+{if count($itemlink) > 0}
+{foreach $itemlink as $il}
+<li><a href="{$il.URL}">{$il.Description}</a></li>
+{/foreach}
+</ul>
+{/if}
+Local:
+{include file="actions.tmpl" actions=$actions}
+{*<pre>{$item|var_dump}</pre>*}
+</div> {* body *}
+</div> {* item *}
+{else}
+{$actions = $item.actions}
+{$sigs = $item.sigs}
+{$attributes = $item.attributes}
+{$breadcrumbs = $item.breadcrumbs}
+<div class="blurb agora item" data-asin="{$attributes.asin}">
+{*<div class="header"><h1>{$attributes.title}</h1></div>*}
+<div class="metadata">
+posted on {$item.datecreatedepoch|datestamp} ({$item.datecreatedepoch|ago} ago)
+{if (count($breadcrumbs) > 0 and (isset($showsig) and $showsig==True))}
+in 
+ <ul class="inlinelist commadelimited">
+ {foreach $breadcrumbs as $crumb}
+  <li>{include file="breadcrumbs.tmpl" breadcrumbs=$crumb linklast=True itemprop=True}</li>
+ {/foreach}
+ </ul>
+{/if} {* breadcrumbs > 0 *}
+</div> {* metadata *}
+<div class="body">
+<p><a href="{$attributes.url}">{$attributes.title}</a></p>
+{*<pre>{$breadcrumbs|var_export}</pre>*}
+</div>
+{if isset($actions) and count($actions) > 0}
+ <div class="footer">{include file="actions.tmpl" actions=$actions}</div>
+{/if}
+</div>
+{/if}

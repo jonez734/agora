@@ -1,0 +1,111 @@
+{$response = $omdb.Response|default:false}
+{$type = $omdb.Type|default:"needinfo"}
+{*response: {$response|var_export}*}
+{if $response === "True"}
+{$plot = $omdb.Plot|default:null}
+{if $plot !== null}
+<li>
+ <div class="blurb spoiler">
+  <div class="header spoiler-btn spoiler-btn-top"><span class="show"><i class="fas fa-eye"></i> Show</span><span class="hide"><i class="fas fa-eye-slash"></i> Hide</span> Plot:</div>
+  <div class="body spoiler-body">{$omdb.Plot}</div>
+ </div>
+</li>
+{/if}
+{$rated = $omdb.Rated|default:null}
+{if $rated !== null}
+<li><span itemprop="contentRating">MPAA Rating: {$omdb.Rated|var_export}</span></li>
+{/if}
+{if is_string($omdb.Writer) === true}
+{if strlen($omdb.Writer) > 0}
+<li>Writer: {$omdb.Writer}</li>
+{/if}
+{else if is_array($omdb.Writer) === true}
+<li>{if count($omdb.Writer) == 1}Writer:{else}Writers:{/if} <ul class="inlinelist commadelimited">{foreach $omdb.Writer as $writer}<li>{$writer|escape:'htmlall'}</li>{/foreach}</ul></li>
+{/if}
+{if is_string($omdb.Actors) === true}
+<li>Actors: {$omdb.Actors|escape:'htmlall'}</li>
+{elseif is_array($omdb.Actors) === true}
+<li>{if count($omdb.Actors) == 1}Actor:{else}Actors: {/if}
+  <ul class="inlinelist commadelimited">
+  {foreach $omdb.Actors as $actor}
+   <li><div style="display: inline;" itemprop="actor" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{$actor|htmlentities}</span></div></li>
+  {/foreach}
+  </ul>
+</li>
+{/if}
+{if $omdb.Awards != null and $omdb.Awards != "N/A"}
+<li>Awards: {$omdb.Awards}</li>
+{/if}
+{$production = $omdb.Production|default:null}
+{if $production !== null}
+<li><div itemprop="productionCompany" itemscope itemtype="http://schema.org/Organization">Production: <span itemprop="name">{$production}</span></div></li>
+{/if}
+{* <li><div itemprop="director" itemscope itemtype="http://schema.org/Person">Director: <span itemprop="name">{$omdb.Director}</span></div></li> *}
+{$director = $omdb.Director|default:null}
+{if $director !== null}
+<li>{if count($director) == 1}Director:{else}Directors: {/if}
+  <ul class="inlinelist commadelimited">
+  {foreach $director as $d}
+   <li><div style="display: inline;" itemprop="director" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{$d|htmlentities}</span></div></li>
+  {/foreach}
+  </ul>
+</li>
+{/if}
+{$runtime = $omdb.Runtime|default:null}
+{if $runtime !== null}
+<li><div itemprop="duration" itemscope itemtype="https://schema.org/Duration">Runtime: {$omdb.Runtime}</div></li>
+{/if}
+<li>IMDB: 
+   <ul class="inlinelist nobullets nomargins nopadding commadelimited">
+    <li><a href="//www.imdb.com/title/{$omdb.imdbID}">main</a></li>
+    <li><a href="//www.imdb.com/title/{$omdb.imdbID}/trivia">trivia</a></li>
+    <li><a href="//www.imdb.com/title/{$omdb.imdbID}/awards">awards</a></li>
+   </ul>
+</li>
+{if count($omdb.Ratings) > 0}
+<li>Ratings: <ul class="inlinelist commadelimited">
+ {foreach $omdb.Ratings as $rating}
+  {$source = $rating.Source}
+  {$value = $rating.Value}
+  <li>{$source}: {$value}</li>
+ {/foreach}
+ </ul>
+</li>
+{/if}
+
+{$genre = $omdb.Genre|default:null}
+{if $genre !== null}
+  {if is_string($genre) === true}
+    <li>Genre: {$genre}</li>
+  {else}
+    <li>{if count($genre) == 1}Genre{else}Genres{/if}: <ul class="inlinelist commadelimited">{foreach $genre as $g}<li><span itemprop="genre">{$g}</span></li>{/foreach}</ul></li>
+  {/if}
+{/if}
+{$language = $omdb.Language|default:null}
+{if $language !== null}
+  {if is_string($language) === true}
+    <li>Language: {$language}</li>
+  {else}
+    <li>{if count($language) == 1}Language{else}Languages{/if}: <ul class="inlinelist commadelimited">{foreach $language as $g}<li><span itemprop="language">{$g}</span></li>{/foreach}</ul></li>
+  {/if}
+{/if}
+
+{$website = $omdb.Website|default:null}
+{if $website !== null and $website != "N/A"}<li>Website: <a href="{$omdb.Website}">{$omdb.Website}</a></li>{/if}
+{$totalseasons = $omdb.totalSeasons|default:null}
+{if $totalseasons !== null}
+Total Seasons: {$totalseasons}
+{/if}
+{$boxoffice = $omdb.BoxOffice|default:null}
+{if $boxoffice !== null}
+<li>Box Office: {$boxoffice}</li>
+{/if}
+{$country = $omdb.Country|default:null}
+{if $country !== null}
+  {if is_string($country) === true}
+    <li>Country: {$country}</li>
+  {else}
+    <li>{if count($country) == 1}Country{else}Countries{/if}: <ul class="inlinelist commadelimited">{foreach $country as $g}<li><span itemprop="country">{$g}</span></li>{/foreach}</ul></li>
+  {/if}
+{/if}
+{/if} {* empty omdb *}
