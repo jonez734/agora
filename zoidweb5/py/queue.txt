@@ -59,9 +59,8 @@
 
 20220828 https://amzn.to/3KtNFjx B000U6BT40 tt0796264 prime eureka (tv series) (2006)
 
-20220904 starz aliens
+20220904 ---                     ---        ---       starz aliens
 20220904 https://amzn.to/3KLMRGM B003ZA0C5U starz final destination (2000)
 20220904 https://amzn.to/3wVZyJj B00ABD0HF4 starz final destination 2 (2003)
-
-
-
+20221029 ---                     ---        amc   final destination (2000)
+20221029 ---                     ---        amc   poltergeist
