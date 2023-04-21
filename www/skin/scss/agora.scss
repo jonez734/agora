@@ -1,0 +1,79 @@
+@import "vars";
+@import "mixins";
+
+//body {
+//  background: $page-backgroundcolor;
+//  color: $page-color;
+//  display: flex;
+//  min-height: 100vh;
+//  flex-direction: column;
+//  margin: 0;
+// }
+
+main {
+	flex: 1;
+	.index {
+		flex: 1 1 auto;
+		order: -1;
+	}
+}
+
+@font-face {
+  font-family: pageheaderfont;
+  src: url("/skin/ttf/caesar.ttf");
+}
+
+header#pageheader {
+  border: 0.125em solid $blurb-border-color;
+  color: lighten(lightskyblue, 15%);
+  @include backgroundgradient(darken($blurb-header-backgroundcolor, 10%), $blurb-header-backgroundcolor);
+}
+
+#topbar {
+	background-color: $blurb-header-backgroundcolor; // #3677B5; // #00A6FB;
+	color: $page-color;
+
+	@include backgroundgradient(darken($blurb-header-backgroundcolor, 10%), $blurb-header-backgroundcolor);
+}
+
+.blurb {
+  background-color: $blurb-body-backgroundcolor; // #6094B5;
+//  margin: 0.25em;
+//  margin-bottom: 0.50em;
+
+  .header {
+    background-color: $blurb-header-backgroundcolor;
+    h1 {
+		@include backgroundgradient(darken($blurb-header-backgroundcolor, 10%), $blurb-header-backgroundcolor);
+		font-family: 'Montserrat', serif;
+		margin: 0;
+  		padding: 0.75em;
+  		font-weight: bold;
+  		font-size: 1.50em;
+  		@include textshadow(); // 4px, 3px, 3px, rgba(0,0,0,0.4)); // darken($backgroundcolor, 2%));
+		color: $blurb-header-color;
+    }
+  }
+ .body { 
+	background-color: $blurb-body-backgroundcolor; // #6094B5;
+        color: $blurb-body-color;
+ }
+}
+
+footer#pagefooter {
+	background-color: $blurb-backgroundcolor;
+	@include backgroundgradient(darken($blurb-header-backgroundcolor, 10%), $blurb-header-backgroundcolor);
+
+}
+
+.maturecontentwarning .body { color: orange; }
+.maturecontentwarning .body a { color: yellow; }
+
+ul {
+ .nomargin {
+	margin: 0;
+ }
+ .nopadding {
+ 	padding: 0;
+ }
+}
