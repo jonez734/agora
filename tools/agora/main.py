@@ -12,7 +12,7 @@ def buildargs(args, **kw):
 def access(args, op, **kw):
     return True
 
-def menu(**kw):
+def help(**kw):
     ttyio.echo("{f6}{var:optioncolor}[A]{var:labelcolor}dd")
     ttyio.echo("{var:optioncolor}[E]{var:labelcolor}dit")
     ttyio.echo("{var:optioncolor}[L]{var:labelcolor}ist")
@@ -23,11 +23,12 @@ def menu(**kw):
 def main(args, **kw):
     bbsengine.util.title("agora")
     
-    menu()
+    help()
 
     done = False
     while not done:
-        choice = ttyio.inputchoice("{f6}{var:promptcolor}agora:{var:inputcolor} ", "AELDQ", "Q", help=menu)
+        lib.setarea(args, "main level", help=True)
+        choice = ttyio.inputchoice("{f6}{var:promptcolor}agora:{var:inputcolor} ", "AELDQ", "Q", help=help)
         if choice == "A":
             ttyio.echo("Add")
             bbsengine.module.runsubmodule(args, "agora.add")
